@@ -42,14 +42,19 @@ export default function Checkout() {
 
   const placeOrder = usePlaceOrder({
     mutation: {
-      onSuccess: () => {
+      onSuccess: (data) => {
         clearCart();
         setOrderPlaced(true);
+        toast({
+          title: 'Order placed',
+          description: 'Thank you — we received your order and will contact you soon.',
+        });
       },
-      onError: () => {
+      onError: (err: any) => {
+        const serverMessage = err?.message || err?.error?.message || err?.response?.data?.message;
         toast({
           title: 'Something went wrong',
-          description: 'Please try again or contact us on Instagram.',
+          description: serverMessage || 'Please try again or contact us on Instagram.',
           variant: 'destructive',
         });
       },

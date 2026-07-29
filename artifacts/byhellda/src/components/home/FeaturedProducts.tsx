@@ -16,7 +16,8 @@ export const FEATURED_PRODUCTS = [
     name: "Mystery Product",
     price: null,
     currency: "JOD",
-    image: "https://cdn.enter.pro/resources/uid_100390812/a6f4d2f6-10e3-4b.jpeg",
+    // Local image path — place the replacement image at `public/mystery.jpg`
+    image: `${import.meta.env.BASE_URL}mystery.jpg`,
     inStock: false,
     comingSoon: true,
     description: "Something new is coming — stay tuned.",
