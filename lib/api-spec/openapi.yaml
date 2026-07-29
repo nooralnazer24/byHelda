@@ -1,0 +1,143 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: orders
+    description: Order operations
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /orders:
+    post:
+      operationId: placeOrder
+      tags: [orders]
+      summary: Place a new order
+      description: Submits a customer order with delivery details
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrderInput"
+      responses:
+        "201":
+          description: Order placed successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+        "400":
+          description: Invalid order data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+    ApiError:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+    OrderItem:
+      type: object
+      properties:
+        name:
+          type: string
+        qty:
+          type: number
+        price:
+          type: number
+      required:
+        - name
+        - qty
+        - price
+    OrderInput:
+      type: object
+      properties:
+        customerName:
+          type: string
+        phone:
+          type: string
+        address:
+          type: string
+        paymentMethod:
+          type: string
+        notes:
+          type: ["string", "null"]
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderItem"
+        total:
+          type: number
+      required:
+        - customerName
+        - phone
+        - address
+        - paymentMethod
+        - items
+        - total
+    Order:
+      type: object
+      properties:
+        id:
+          type: number
+        customerName:
+          type: string
+        phone:
+          type: string
+        address:
+          type: string
+        paymentMethod:
+          type: string
+        notes:
+          type: ["string", "null"]
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderItem"
+        total:
+          type: number
+        status:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - customerName
+        - phone
+        - address
+        - paymentMethod
+        - items
+        - total
+        - status
+        - createdAt

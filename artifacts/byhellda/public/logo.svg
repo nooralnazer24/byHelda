@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <circle cx="100" cy="100" r="100" fill="white"/>
+  <circle cx="100" cy="100" r="96" fill="white" stroke="#f472b6" stroke-width="1.5"/>
+  <text x="100" y="82" font-family="Georgia, serif" font-size="13" font-weight="400" fill="#be185d" text-anchor="middle" letter-spacing="4">BY</text>
+  <text x="100" y="118" font-family="Georgia, serif" font-size="32" font-weight="700" fill="#be185d" text-anchor="middle" letter-spacing="2">HELDA</text>
+  <path d="M55 128 Q100 138 145 128" stroke="#f9a8d4" stroke-width="1.5" fill="none"/>
+</svg>
