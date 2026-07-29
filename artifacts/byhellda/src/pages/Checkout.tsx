@@ -136,12 +136,12 @@ export default function Checkout() {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
-            className="order-2 lg:order-1"
+            className="order-1 lg:order-1"
           >
             <h2 className="font-serif text-xl font-semibold mb-6">Order Summary</h2>
             <div className="bg-card border border-card-border rounded-2xl p-6 space-y-4">
               {items.map((item) => (
-                <div key={item.name} className="flex items-center gap-4">
+                <div key={item.id || item.name} className="flex items-center gap-4">
                   {item.image && (
                     <img src={item.image} alt={item.name} className="w-14 h-14 rounded-xl object-cover bg-muted flex-shrink-0" />
                   )}
@@ -174,7 +174,7 @@ export default function Checkout() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
-            className="order-1 lg:order-2"
+            className="order-2 lg:order-2"
           >
             <h2 className="font-serif text-xl font-semibold mb-6">Delivery Details</h2>
             <div className="bg-card border border-card-border rounded-2xl p-6">

@@ -9,6 +9,7 @@ import { Route, Switch, Router as WouterRouter, useLocation } from 'wouter';
 import { SiteLayout } from '@/components/layout/SiteLayout';
 import { CartProvider } from '@/context/CartContext';
 import { getClerkBootstrap } from '@/lib/clerkConfig';
+import { setBaseUrl } from '@workspace/api-client-react';
 
 import Index from '@/pages/Index';
 import Products from '@/pages/Products';
@@ -27,6 +28,9 @@ const clerkBootstrap = getClerkBootstrap({
 
 const clerkPubKey = clerkBootstrap.publishableKey;
 const clerkProxyUrl = clerkBootstrap.proxyUrl;
+
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '') ?? null;
+setBaseUrl(apiBaseUrl ?? window.location.origin);
 
 function stripBase(path: string): string {
   return basePath && path.startsWith(basePath)
