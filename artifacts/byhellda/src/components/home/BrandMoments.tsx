@@ -5,7 +5,7 @@ import { Play, Pause } from 'lucide-react';
 const BASE = import.meta.env.BASE_URL;
 
 const photos = [
-  { src: `${BASE}event-mirror.jpeg`,  alt: 'byHellda launch event — mirror moment' },
+  { src: `${BASE}mystery.jpg`,  alt: 'byHellda launch event — mirror moment' },
   { src: `${BASE}event-bags.jpeg`,    alt: 'Shoppers with byHellda branded bags' },
   { src: `${BASE}event-apply.jpeg`,   alt: 'Applying byHellda lip gloss' },
   { src: `${BASE}event-unbox.jpeg`,   alt: 'Unboxing a byHellda package' },
