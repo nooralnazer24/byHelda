@@ -36,7 +36,7 @@ export default function Checkout() {
   const [orderPlaced, setOrderPlaced] = useState(false);
 
   const form = useForm<CheckoutFormValues>({
-    resolver: zodResolver(checkoutSchema),
+    resolver: zodResolver(checkoutSchema) as any,
     defaultValues: { customerName: '', phone: '', address: '', notes: '' },
   });
 

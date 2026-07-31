@@ -29,6 +29,11 @@ router.post("/orders", async (req, res) => {
       })
       .returning();
 
+    // Safely parse or fallback the creation date string
+    const fallbackIsoString = order?.createdAt instanceof Date 
+      ? order.createdAt.toISOString() 
+      : new Date().toISOString();
+
     // Mirror to Supabase so the owner can see orders in their dashboard
     try {
       const supabase = getSupabaseClient();
@@ -42,7 +47,7 @@ router.post("/orders", async (req, res) => {
         items: order.items,
         total: Number(order.total),
         status: order.status,
-        created_at: order.createdAt.toISOString(),
+        created_at: fallbackIsoString,
       });
     } catch (supabaseErr) {
       // Log but don't fail the request — local DB write already succeeded
@@ -59,7 +64,7 @@ router.post("/orders", async (req, res) => {
       items: order.items,
       total: Number(order.total),
       status: order.status,
-      createdAt: order.createdAt.toISOString(),
+      createdAt: fallbackIsoString,
     });
   } catch (err) {
     req.log.error({ err }, "Failed to create order");
