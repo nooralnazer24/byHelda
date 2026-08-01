@@ -13,6 +13,18 @@ import { logger } from "./lib/logger";
 
 const app: Express = express();
 
+// 1. MOVE CORS TO THE VERY TOP
+// Explicitly setting your Vercel URL ensures the browser trusts the connection perfectly.
+app.use(
+  cors({
+    origin: ["https://by-helda-byhellda.vercel.app", "http://localhost:3000"], 
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
+  })
+);
+
+// 2. Logging middleware
 app.use(
   pinoHttp({
     logger,
@@ -36,7 +48,6 @@ app.use(
 // Clerk proxy must come before body parsers
 app.use(CLERK_PROXY_PATH, clerkProxyMiddleware());
 
-app.use(cors({ credentials: true, origin: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
