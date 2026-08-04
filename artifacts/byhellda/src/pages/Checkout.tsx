@@ -140,8 +140,8 @@ export default function Checkout() {
           >
             <h2 className="font-serif text-xl font-semibold mb-6">Order Summary</h2>
             <div className="bg-card border border-card-border rounded-2xl p-6 space-y-4">
-              {items.map((item) => (
-                <div key={item.id || item.name} className="flex items-center gap-4">
+              {items.map((item, index) => (
+                <div key={item.name || index} className="flex items-center gap-4">
                   {item.image && (
                     <img src={item.image} alt={item.name} className="w-14 h-14 rounded-xl object-cover bg-muted flex-shrink-0" />
                   )}
