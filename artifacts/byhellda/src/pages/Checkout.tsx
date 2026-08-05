@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link, useLocation } from 'wouter';
-import { usePlaceOrder } from '@workspace/api-client-react';
+import { supabase } from '../lib/supabase';
 import { useCart } from '@/context/CartContext';
 import { Button } from '@/components/ui/button';
 import {
@@ -34,46 +34,56 @@ export default function Checkout() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [orderPlaced, setOrderPlaced] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<CheckoutFormValues>({
     resolver: zodResolver(checkoutSchema) as any,
     defaultValues: { customerName: '', phone: '', address: '', notes: '' },
   });
 
-  const placeOrder = usePlaceOrder({
-    mutation: {
-      onSuccess: (data) => {
-        clearCart();
-        setOrderPlaced(true);
-        toast({
-          title: 'Order placed',
-          description: 'Thank you — we received your order and will contact you soon.',
-        });
-      },
-      onError: (err: any) => {
-        const serverMessage = err?.message || err?.error?.message || err?.response?.data?.message;
-        toast({
-          title: 'Something went wrong',
-          description: serverMessage || 'Please try again or contact us on Instagram.',
-          variant: 'destructive',
-        });
-      },
-    },
-  });
-
-  const onSubmit = (values: CheckoutFormValues) => {
+  const onSubmit = async (values: CheckoutFormValues) => {
     if (items.length === 0) return;
-    placeOrder.mutate({
-      data: {
-        customerName: values.customerName,
-        phone: values.phone,
-        address: values.address,
-        paymentMethod: 'cod',
-        notes: values.notes ?? null,
-        items: items.map((i) => ({ name: i.name, qty: i.qty, price: i.price })),
-        total,
-      },
-    });
+
+    setIsSubmitting(true);
+
+    try {
+      const { error } = await supabase.from('orders').insert([
+        {
+          customer_name: values.customerName,
+          phone: values.phone,
+          address: values.address,
+          notes: values.notes || null,
+          items: items.map((i) => ({ name: i.name, qty: i.qty, price: i.price })),
+          total_amount: total,
+          status: 'pending',
+        },
+      ]);
+
+      if (error) {
+        throw new Error(error.message || 'Failed to submit order to Supabase');
+      }
+
+      clearCart();
+      setOrderPlaced(true);
+      toast({
+        title: 'Order placed',
+        description: 'Thank you — we received your order and will contact you soon.',
+      });
+    } catch (err: any) {
+      console.error('Supabase submission error:', err);
+      
+      const errorMessage = typeof err === 'string' 
+        ? err 
+        : err?.message || 'Please try again or contact us on Instagram.';
+
+      toast({
+        title: 'Something went wrong',
+        description: String(errorMessage),
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (orderPlaced) {
@@ -219,10 +229,10 @@ export default function Checkout() {
                     <Button
                       type="submit"
                       className="w-full h-14 text-base rounded-full shadow-[var(--shadow-glow)] hover:scale-[1.02] transition-transform"
-                      disabled={placeOrder.isPending}
+                      disabled={isSubmitting}
                       data-testid="button-place-order"
                     >
-                      {placeOrder.isPending ? (
+                      {isSubmitting ? (
                         <><Loader2 className="mr-2 h-5 w-5 animate-spin" />Placing your order…</>
                       ) : (
                         `Place Order — ${total.toFixed(2)} JOD`

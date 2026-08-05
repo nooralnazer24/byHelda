@@ -15,6 +15,7 @@ import Index from '@/pages/Index';
 import Products from '@/pages/Products';
 import Gallery from '@/pages/Gallery';
 import Checkout from '@/pages/Checkout';
+import AdminOrders from '@/pages/AdminOrders';
 
 const queryClient = new QueryClient();
 
@@ -130,6 +131,7 @@ function Router() {
         <Route path="/products" component={Products} />
         <Route path="/gallery" component={Gallery} />
         <Route path="/checkout" component={Checkout} />
+        <Route path="/admin" component={AdminOrders} />
         <Route path="/sign-in/*?" component={SignInPage} />
         <Route path="/sign-up/*?" component={SignUpPage} />
         <Route component={NotFound} />
