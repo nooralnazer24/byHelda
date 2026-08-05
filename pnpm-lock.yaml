@@ -157,6 +157,9 @@ importers:
 
   .:
     dependencies:
+      '@radix-ui/react-dialog':
+        specifier: ^1.1.23
+        version: 1.1.23(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@replit/connectors-sdk':
         specifier: ^0.4.1
         version: 0.4.1
@@ -190,7 +193,7 @@ importers:
     dependencies:
       '@clerk/express':
         specifier: ^2.1.47
-        version: 2.1.47(express@5.2.1)
+        version: 2.1.47(express@5.2.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@clerk/shared':
         specifier: ^4.25.8
         version: 4.25.8(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -3477,7 +3480,7 @@ snapshots:
       '@babel/helper-string-parser': 7.29.7
       '@babel/helper-validator-identifier': 7.29.7
 
-  '@clerk/backend@3.13.2':
+  '@clerk/backend@3.13.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
       '@clerk/shared': 4.25.8(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       standardwebhooks: 1.0.0
@@ -3486,9 +3489,9 @@ snapshots:
       - react
       - react-dom
 
-  '@clerk/express@2.1.47(express@5.2.1)':
+  '@clerk/express@2.1.47(express@5.2.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
-      '@clerk/backend': 3.13.2
+      '@clerk/backend': 3.13.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@clerk/shared': 4.25.8(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       express: 5.2.1
       tslib: 2.8.1
