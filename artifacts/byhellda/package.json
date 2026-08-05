@@ -77,6 +77,7 @@
   "dependencies": {
     "@clerk/react": "^6.12.8",
     "@clerk/themes": "^2.4.57",
-    "@radix-ui/react-visually-hidden": "^1.2.11"
+    "@radix-ui/react-visually-hidden": "^1.2.11",
+    "radix-ui": "^1.6.7"
   }
 }
