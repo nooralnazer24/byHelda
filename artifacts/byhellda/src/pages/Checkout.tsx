@@ -17,8 +17,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { CheckCircle2, Loader2, ShoppingBag, ArrowLeft, Banknote } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { CheckCircle2, Loader2, ShoppingBag, ArrowLeft, Banknote, PartyPopper, Tag, X, Sparkles } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const checkoutSchema = z.object({
   customerName: z.string().min(2, 'Name must be at least 2 characters'),
@@ -29,12 +29,48 @@ const checkoutSchema = z.object({
 
 type CheckoutFormValues = z.infer<typeof checkoutSchema>;
 
+// Promo codes live here — add more anytime by adding a new entry.
+const PROMO_CODES: Record<string, { percentOff: number; label: string }> = {
+  SETFAM: { percentOff: 20, label: "Family & Friends" },
+};
+
 export default function Checkout() {
   const { items, total, clearCart } = useCart();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [promoInput, setPromoInput] = useState('');
+  const [appliedPromo, setAppliedPromo] = useState<{ code: string; percentOff: number; label: string } | null>(null);
+  const [promoError, setPromoError] = useState<string | null>(null);
+  const [justApplied, setJustApplied] = useState(false);
+
+  const discountAmount = appliedPromo ? (total * appliedPromo.percentOff) / 100 : 0;
+  const finalTotal = total - discountAmount;
+
+  const handleApplyPromo = () => {
+    const code = promoInput.trim().toUpperCase();
+    if (!code) return;
+    const match = PROMO_CODES[code];
+    if (match) {
+      setAppliedPromo({ code, ...match });
+      setPromoError(null);
+      setJustApplied(true);
+      setTimeout(() => setJustApplied(false), 1200);
+      toast({
+        title: `${match.label} discount unlocked! 🎉`,
+        description: `${match.percentOff}% off is on the house.`,
+      });
+    } else {
+      setPromoError("That code doesn't look right — double check and try again.");
+    }
+  };
+
+  const handleRemovePromo = () => {
+    setAppliedPromo(null);
+    setPromoInput('');
+    setPromoError(null);
+  };
 
   const form = useForm<CheckoutFormValues>({
     resolver: zodResolver(checkoutSchema) as any,
@@ -47,14 +83,19 @@ export default function Checkout() {
     setIsSubmitting(true);
 
     try {
+      const promoNote = appliedPromo
+        ? `Promo applied: ${appliedPromo.code} (-${appliedPromo.percentOff}%, saved ${discountAmount.toFixed(2)} JOD)`
+        : null;
+      const combinedNotes = [values.notes, promoNote].filter(Boolean).join(' | ') || null;
+
       const { error } = await supabase.from('orders').insert([
         {
           customer_name: values.customerName,
           phone: values.phone,
           address: values.address,
-          notes: values.notes || null,
+          notes: combinedNotes,
           items: items.map((i) => ({ name: i.name, qty: i.qty, price: i.price })),
-          total_amount: total,
+          total_amount: finalTotal,
           status: 'pending',
         },
       ]);
@@ -162,9 +203,101 @@ export default function Checkout() {
                   <p className="font-semibold text-sm text-primary whitespace-nowrap">{(item.price * item.qty).toFixed(2)} JOD</p>
                 </div>
               ))}
+              {/* Promo code */}
+              <div className="border-t border-border pt-4">
+                <AnimatePresence mode="wait">
+                  {appliedPromo ? (
+                    <motion.div
+                      key="applied"
+                      initial={{ opacity: 0, y: -6 }}
+                      animate={{ opacity: 1, y: 0, scale: justApplied ? [1, 1.03, 1] : 1 }}
+                      exit={{ opacity: 0, y: -6 }}
+                      transition={{ duration: 0.35 }}
+                      className="flex items-center justify-between gap-3 rounded-xl border border-primary/30 bg-primary/5 px-4 py-3"
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        <PartyPopper className="h-4 w-4 text-primary shrink-0" />
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-foreground truncate">
+                            {appliedPromo.code} applied — {appliedPromo.label}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {appliedPromo.percentOff}% off, you saved {discountAmount.toFixed(2)} JOD
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleRemovePromo}
+                        className="text-muted-foreground hover:text-foreground transition-colors shrink-0"
+                        aria-label="Remove promo code"
+                        data-testid="button-remove-promo"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="input"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.25 }}
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className="relative flex-1">
+                          <Tag className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            value={promoInput}
+                            onChange={(e) => {
+                              setPromoInput(e.target.value);
+                              if (promoError) setPromoError(null);
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                handleApplyPromo();
+                              }
+                            }}
+                            placeholder="Have a promo code?"
+                            className="pl-9 uppercase placeholder:normal-case"
+                            data-testid="input-promo-code"
+                          />
+                        </div>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={handleApplyPromo}
+                          className="rounded-full shrink-0"
+                          data-testid="button-apply-promo"
+                        >
+                          <Sparkles className="h-4 w-4 mr-1.5" />
+                          Apply
+                        </Button>
+                      </div>
+                      {promoError && (
+                        <p className="text-xs text-destructive mt-2">{promoError}</p>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {appliedPromo && (
+                <div className="flex items-center justify-between text-sm text-primary">
+                  <span>Discount ({appliedPromo.percentOff}%)</span>
+                  <span>-{discountAmount.toFixed(2)} JOD</span>
+                </div>
+              )}
+
               <div className="border-t border-border pt-4 flex items-center justify-between font-semibold text-base">
                 <span>Total</span>
-                <span className="text-primary">{total.toFixed(2)} JOD</span>
+                <div className="text-right">
+                  {appliedPromo && (
+                    <p className="text-xs font-normal text-muted-foreground line-through">{total.toFixed(2)} JOD</p>
+                  )}
+                  <span className="text-primary">{finalTotal.toFixed(2)} JOD</span>
+                </div>
               </div>
             </div>
 
@@ -235,7 +368,7 @@ export default function Checkout() {
                       {isSubmitting ? (
                         <><Loader2 className="mr-2 h-5 w-5 animate-spin" />Placing your order…</>
                       ) : (
-                        `Place Order — ${total.toFixed(2)} JOD`
+                        `Place Order — ${finalTotal.toFixed(2)} JOD`
                       )}
                     </Button>
                     <p className="text-xs text-muted-foreground text-center mt-3">
