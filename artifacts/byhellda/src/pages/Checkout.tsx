@@ -31,7 +31,7 @@ type CheckoutFormValues = z.infer<typeof checkoutSchema>;
 
 // Promo codes live here — add more anytime by adding a new entry.
 const PROMO_CODES: Record<string, { percentOff: number; label: string }> = {
-  SETFAM: { percentOff: 20, label: "Family & Friends" },
+  SETFAM: { percentOff: 10, label: "Family & Friends" },
 };
 
 export default function Checkout() {
